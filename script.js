@@ -12,7 +12,7 @@
      ------------------------------------------------------------------------ */
   var CONFIG = {
     countdownTarget: '2026-11-12T23:00:00+05:30', // Nikah date/time, IST
-    mapsUrl: '' // Add a Google Maps URL here when available, e.g. "https://maps.google.com/?q=..."
+    mapsUrl: 'https://www.google.com/maps/place/(%D9%85%D8%B3%D8%AC%D8%AF+%D8%B9%D9%85%D8%B1+)MASJID+E+UMAR%E2%80%AD/@24.0212127,85.3126037,3029m/data=!3m1!1e3!4m10!1m2!2m1!1sRomi+Hazaribagh+umar+masjid!3m6!1s0x39f49fac9cbed1af:0x213f8c53846a620c!8m2!3d24.0212476!4d85.3316749!15sChtSb21pIEhhemFyaWJhZ2ggdW1hciBtYXNqaWSSAQZtb3NxdWXgAQA!16s%2Fg%2F11mb_gmcc_?entry=ttu&g_ep=EgoyMDI2MDkwMi4wIKXMDSoASAFQAw%3D%3D' // Add a Google Maps URL here when available, e.g. "https://maps.google.com/?q=..."
   };
 
   /* ------------------------------------------------------------------------
