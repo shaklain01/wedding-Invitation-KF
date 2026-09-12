@@ -184,25 +184,25 @@ button {
 .section-floral--tl {
   top: 22px;
   left: 22px;
-  background-image: url("corner-tl.png");
+  background-image: url("images/corner-tl.png");
   background-position: top left;
 }
 .section-floral--tr {
   top: 22px;
   right: 22px;
-  background-image: url("corner-tr.png");
+  background-image: url("images/corner-tr.png");
   background-position: top right;
 }
 .section-floral--bl {
   bottom: 22px;
   left: 22px;
-  background-image: url("corner-bl.png");
+  background-image: url("images/corner-bl.png");
   background-position: bottom left;
 }
 .section-floral--br {
   bottom: 22px;
   right: 22px;
-  background-image: url("corner-br.png");
+  background-image: url("images/corner-br.png");
   background-position: bottom right;
 }
 
@@ -684,7 +684,7 @@ button {
   bottom: 0 !important;
   z-index: 0 !important;
   pointer-events: none;
-  background-image: url("background_for_hero.png");
+  background-image: url("images/background_for_hero.png");
   background-repeat: no-repeat;
   background-size: auto 82%;
   background-position: center;
