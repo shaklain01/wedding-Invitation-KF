@@ -17,17 +17,23 @@
   --ink: #2a1810;
 
   /* Type */
-  --font-display: 'Cinzel', serif;
-  --font-serif: 'Cormorant Garamond', serif;
-  --font-body: 'Jost', sans-serif;
-  --font-urdu: 'Noto Nastaliq Urdu', serif;
+  --font-display: "Cinzel", serif;
+  --font-serif: "Cormorant Garamond", serif;
+  --font-body: "Jost", sans-serif;
+  --font-urdu: "Noto Nastaliq Urdu", serif;
 
   --ease-royal: cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-*, *::before, *::after { box-sizing: border-box; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   margin: 0;
@@ -37,21 +43,55 @@ body {
   font-weight: 300;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  position: relative;
 }
 
-body.lock-scroll { overflow: hidden; height: 100%; }
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
 
-img, svg { max-width: 100%; display: block; }
+body.lock-scroll {
+  overflow: hidden;
+  height: 100%;
+}
 
-a { color: inherit; text-decoration: none; }
+img,
+svg {
+  max-width: 100%;
+  display: block;
+}
 
-button { font-family: inherit; cursor: pointer; border: none; background: none; }
+a {
+  color: inherit;
+  text-decoration: none;
+}
 
-::selection { background: var(--gold); color: var(--maroon-deep); }
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+::selection {
+  background: var(--gold);
+  color: var(--maroon-deep);
+}
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
@@ -74,7 +114,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   margin: 0 0 14px;
 }
 
-.section-heading-eyebrow { margin-top: 0; }
+.section-heading-eyebrow {
+  margin-top: 0;
+}
 
 .section-title {
   font-family: var(--font-serif);
@@ -84,6 +126,26 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   color: var(--maroon);
   text-align: center;
   margin: 0 0 56px;
+  position: relative;
+  display: inline-block;
+}
+.section-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  transform: translateX(-50%);
+  width: 0;
+  height: 1.4px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  transition: width 1.1s var(--ease-royal) 0.15s;
+}
+.section-title.underline-on::after {
+  width: 140px;
+}
+.timeline-section .section-title,
+.countdown .section-title {
+  display: block;
 }
 
 .gold-divider {
@@ -94,18 +156,91 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   margin: 36px auto 0;
   width: 220px;
 }
-.gold-divider span { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
-.gold-divider__icon { width: 16px; height: 16px; fill: var(--gold); flex-shrink: 0; }
+.gold-divider span {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.gold-divider__icon {
+  width: 16px;
+  height: 16px;
+  fill: var(--gold);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   FLORAL CORNER MOTIF — real watercolor corner images (same folder as index.html)
+   ========================================================================== */
+.section-floral {
+  position: absolute;
+  width: 150px;
+  aspect-ratio: 1.31 / 1;
+  opacity: 0.75;
+  pointer-events: none;
+  z-index: 0;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+.section-floral--tl {
+  top: 22px;
+  left: 22px;
+  background-image: url("corner-tl.png");
+  background-position: top left;
+}
+.section-floral--tr {
+  top: 22px;
+  right: 22px;
+  background-image: url("corner-tr.png");
+  background-position: top right;
+}
+.section-floral--bl {
+  bottom: 22px;
+  left: 22px;
+  background-image: url("corner-bl.png");
+  background-position: bottom left;
+}
+.section-floral--br {
+  bottom: 22px;
+  right: 22px;
+  background-image: url("corner-br.png");
+  background-position: bottom right;
+}
+
+/* Mobile — inset inward a bit more, per request */
+@media (max-width: 640px) {
+  .section-floral {
+    width: 92px;
+    opacity: 0.7;
+  }
+  .section-floral--tl {
+    top: 18px;
+    left: 18px;
+  }
+  .section-floral--tr {
+    top: 18px;
+    right: 18px;
+  }
+  .section-floral--bl {
+    bottom: 18px;
+    left: 18px;
+  }
+  .section-floral--br {
+    bottom: 18px;
+    right: 18px;
+  }
+}
 
 /* ==========================================================================
    PARTICLE CANVAS
    ========================================================================== */
+/* Falling petal-rain canvas — see initPetalRain() in script.js.
+   pointer-events:none so it never blocks clicks/scroll. */
 #particle-canvas {
   position: fixed;
   inset: 0;
   z-index: 2;
   pointer-events: none;
-  opacity: 0.55;
+  opacity: 0.8;
 }
 
 /* ==========================================================================
@@ -115,14 +250,25 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: radial-gradient(ellipse at 50% 20%, var(--maroon-soft) 0%, var(--maroon) 45%, var(--maroon-deep) 100%);
+  background: radial-gradient(
+    ellipse at 50% 20%,
+    var(--maroon-soft) 0%,
+    var(--maroon) 45%,
+    var(--maroon-deep) 100%
+  );
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: opacity 0.9s var(--ease-royal), visibility 0.9s;
+  transition:
+    opacity 0.9s var(--ease-royal),
+    visibility 0.9s;
 }
-.opening.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+.opening.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
 
 .opening__arch {
   position: absolute;
@@ -134,11 +280,25 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   animation: archReveal 1.6s var(--ease-royal) 0.3s forwards;
 }
 @keyframes archReveal {
-  from { opacity: 0; transform: translateX(-50%) translateY(24px) scale(0.96); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
 }
-.arch-path { fill: none; stroke: var(--gold); stroke-width: 1.4; opacity: 0.55; }
-.arch-path--inner { stroke-width: 0.8; opacity: 0.35; }
+.arch-path {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.4;
+  opacity: 0.55;
+}
+.arch-path--inner {
+  stroke-width: 0.8;
+  opacity: 0.35;
+}
 
 .opening__content {
   position: relative;
@@ -155,7 +315,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   margin: 0 0 10px;
   opacity: 0;
 }
-.opening.is-active .opening__bismillah { animation: fadeUp 1.1s var(--ease-royal) 0.6s forwards; }
+.opening.is-active .opening__bismillah {
+  animation: fadeUp 1.1s var(--ease-royal) 0.6s forwards;
+}
 
 .opening__translation {
   font-family: var(--font-body);
@@ -166,7 +328,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   opacity: 0;
   margin: 0 0 34px;
 }
-.opening.is-active .opening__translation { animation: fadeUp 1.1s var(--ease-royal) 0.9s forwards; }
+.opening.is-active .opening__translation {
+  animation: fadeUp 1.1s var(--ease-royal) 0.9s forwards;
+}
 
 .opening__names {
   display: flex;
@@ -176,7 +340,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   flex-wrap: wrap;
   opacity: 0;
 }
-.opening.is-active .opening__names { animation: fadeUp 1.2s var(--ease-royal) 1.2s forwards; }
+.opening.is-active .opening__names {
+  animation: fadeUp 1.2s var(--ease-royal) 1.2s forwards;
+}
 .opening__name {
   font-family: var(--font-display);
   font-weight: 500;
@@ -200,11 +366,19 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   margin: 22px 0 46px;
   opacity: 0;
 }
-.opening.is-active .opening__tagline { animation: fadeUp 1.1s var(--ease-royal) 1.55s forwards; }
+.opening.is-active .opening__tagline {
+  animation: fadeUp 1.1s var(--ease-royal) 1.55s forwards;
+}
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .btn-enter {
@@ -218,15 +392,24 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   background: transparent;
   border-radius: 2px;
   opacity: 0;
-  transition: color 0.4s var(--ease-royal), box-shadow 0.4s var(--ease-royal), background 0.4s var(--ease-royal);
+  transition:
+    color 0.4s var(--ease-royal),
+    box-shadow 0.4s var(--ease-royal),
+    background 0.4s var(--ease-royal);
 }
-.opening.is-active .btn-enter { animation: fadeUp 1.1s var(--ease-royal) 1.9s forwards; }
-.btn-enter:hover, .btn-enter:focus-visible {
+.opening.is-active .btn-enter {
+  animation: fadeUp 1.1s var(--ease-royal) 1.9s forwards;
+}
+.btn-enter:hover,
+.btn-enter:focus-visible {
   color: var(--maroon-deep);
   background: var(--gold);
   box-shadow: 0 0 28px rgba(201, 163, 92, 0.55);
 }
-.btn-enter:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 4px; }
+.btn-enter:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 4px;
+}
 
 /* ==========================================================================
    REVEAL DOORS (curtain transition)
@@ -242,22 +425,70 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   flex: 1;
   background:
     linear-gradient(var(--maroon-deep), var(--maroon-deep)) padding-box,
-    repeating-linear-gradient(90deg, transparent 0 38px, rgba(201,163,92,0.08) 38px 40px);
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 38px,
+      rgba(201, 163, 92, 0.08) 38px 40px
+    );
   position: relative;
   transition: transform 1.15s var(--ease-royal);
 }
 .reveal-door::after {
-  content: '';
+  content: "";
   position: absolute;
-  top: 0; bottom: 0;
+  top: 0;
+  bottom: 0;
   width: 2px;
   background: linear-gradient(var(--gold), var(--gold-dim));
   opacity: 0.7;
 }
-.reveal-door--left::after { right: 0; }
-.reveal-door--right::after { left: 0; }
-.reveal-door--left.is-open { transform: translateX(-102%); }
-.reveal-door--right.is-open { transform: translateX(102%); }
+.reveal-door--left::after {
+  right: 0;
+}
+.reveal-door--right::after {
+  left: 0;
+}
+.reveal-door--left.is-open {
+  transform: translateX(-102%);
+}
+.reveal-door--right.is-open {
+  transform: translateX(102%);
+}
+
+.door-shimmer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 3px;
+  transform: translateX(-50%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(224, 189, 122, 0.9) 0%,
+    rgba(201, 163, 92, 0.3) 40%,
+    transparent 75%
+  );
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.door-shimmer.is-flashing {
+  animation: shimmerFlash 0.9s ease-out forwards;
+}
+@keyframes shimmerFlash {
+  0% {
+    opacity: 0;
+    width: 3px;
+  }
+  35% {
+    opacity: 1;
+    width: 60px;
+  }
+  100% {
+    opacity: 0;
+    width: 140px;
+  }
+}
 
 /* ==========================================================================
    MAIN SITE
@@ -290,18 +521,26 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   align-items: center;
   justify-content: center;
   gap: 5px;
-  box-shadow: 0 4px 18px rgba(74,14,24,0.14);
+  box-shadow: 0 4px 18px rgba(74, 14, 24, 0.14);
   transition: background 0.3s var(--ease-royal);
 }
 .floatnav__toggle span {
   width: 18px;
   height: 1.4px;
   background: var(--maroon);
-  transition: transform 0.35s var(--ease-royal), opacity 0.25s;
+  transition:
+    transform 0.35s var(--ease-royal),
+    opacity 0.25s;
 }
-.floatnav__toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.4px) rotate(45deg); }
-.floatnav__toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
-.floatnav__toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-6.4px) rotate(-45deg); }
+.floatnav__toggle[aria-expanded="true"] span:nth-child(1) {
+  transform: translateY(6.4px) rotate(45deg);
+}
+.floatnav__toggle[aria-expanded="true"] span:nth-child(2) {
+  opacity: 0;
+}
+.floatnav__toggle[aria-expanded="true"] span:nth-child(3) {
+  transform: translateY(-6.4px) rotate(-45deg);
+}
 
 .floatnav__list {
   list-style: none;
@@ -310,7 +549,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   background: rgba(250, 243, 228, 0.97);
   border: 1px solid var(--gold);
   border-radius: 10px;
-  box-shadow: 0 12px 34px rgba(74,14,24,0.16);
+  box-shadow: 0 12px 34px rgba(74, 14, 24, 0.16);
   min-width: 168px;
   position: absolute;
   top: 56px;
@@ -318,7 +557,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   opacity: 0;
   transform: translateY(-8px);
   pointer-events: none;
-  transition: opacity 0.3s var(--ease-royal), transform 0.3s var(--ease-royal);
+  transition:
+    opacity 0.3s var(--ease-royal),
+    transform 0.3s var(--ease-royal);
 }
 .floatnav__list.is-open {
   opacity: 1;
@@ -333,18 +574,90 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   letter-spacing: 0.1em;
   color: var(--maroon);
   border-radius: 6px;
-  transition: background 0.25s, color 0.25s;
+  transition:
+    background 0.25s,
+    color 0.25s;
 }
 .floatnav__list li a:hover,
-.floatnav__list li a:focus-visible { background: var(--champagne); color: var(--maroon-deep); }
+.floatnav__list li a:focus-visible {
+  background: var(--champagne);
+  color: var(--maroon-deep);
+}
 
 @media (min-width: 860px) {
-  .floatnav { top: 28px; right: 40px; }
+  .floatnav {
+    top: 28px;
+    right: 40px;
+  }
 }
 
 /* ==========================================================================
-   HERO
+   SCROLL-SCRUBBED 3D ZOOM (cards & headings grow into view while scrolling)
    ========================================================================== */
+.zoom-in {
+  opacity: 0;
+  transform: perspective(1000px) scale(0.62) translateY(70px) translateZ(-160px);
+  will-change: transform, opacity;
+}
+.zoom-in.is-visible {
+  transition:
+    transform 0.9s var(--ease-royal),
+    opacity 0.9s var(--ease-royal);
+  opacity: 1;
+  transform: perspective(1000px) scale(1) translateY(0) translateZ(0);
+}
+
+/* ==========================================================================
+   3D TILT CARDS + GLARE
+   ========================================================================== */
+.tilt-card {
+  position: relative;
+  transform-style: preserve-3d;
+  transition:
+    transform 0.15s ease-out,
+    box-shadow 0.25s ease-out;
+  will-change: transform;
+  overflow: hidden;
+}
+.tilt-card:hover {
+  box-shadow:
+    0 30px 60px -12px rgba(74, 14, 24, 0.35),
+    0 0 0 1px rgba(201, 163, 92, 0.3);
+  z-index: 5;
+}
+.tilt-glare {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  z-index: 2;
+}
+.hero__medallion {
+  display: block;
+  width: min(230px, 62vw);
+  height: auto;
+  margin: 0 auto 8px;
+  overflow: visible;
+}
+.medallion-line {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.medallion-line--soft {
+  stroke-width: 0.8;
+  opacity: 0.45;
+}
+.medallion-fill {
+  fill: var(--gold);
+  opacity: 0.85;
+}
+
 .hero {
   position: relative;
   min-height: 100svh;
@@ -354,9 +667,96 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   justify-content: center;
   text-align: center;
   padding: 100px 24px 60px;
-  background:
-    radial-gradient(ellipse at 50% -10%, rgba(201,163,92,0.16), transparent 60%),
-    var(--ivory);
+  background: var(--ivory);
+  overflow: hidden;
+}
+
+/* background_for_hero.png — floral corners, hanging ornament, palace.
+   Sized by HEIGHT (not width) so the full artwork always fits vertically
+   within the hero — this guarantees the palace/bottom never gets cropped,
+   regardless of screen size. Width scales automatically to keep the
+   image's natural proportions (never stretched). */
+.hero__bg {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 0 !important;
+  pointer-events: none;
+  background-image: url("background_for_hero.png");
+  background-repeat: no-repeat;
+  background-size: auto 82%;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 1.5s var(--ease-royal);
+}
+.hero__bg.is-in {
+  opacity: 0.5;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__bg {
+    transition: none;
+    opacity: 1;
+  }
+}
+
+/* Tablet: slightly smaller so it doesn't dominate the narrower width */
+@media (max-width: 999px) {
+  .hero__bg {
+    background-size: auto 70%;
+  }
+}
+
+/* Mobile: smaller still, so flowers frame the text instead of
+   overlapping/crowding it on narrow screens */
+@media (max-width: 640px) {
+  .hero__bg {
+    background-size: auto 55%;
+  }
+}
+
+.hero__glow {
+  position: absolute;
+  width: 60vw;
+  height: 60vw;
+  max-width: 620px;
+  max-height: 620px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(201, 163, 92, 0.14) 0%,
+    transparent 70%
+  );
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+  z-index: 0;
+  animation: heroGlowDrift 14s ease-in-out infinite;
+}
+@keyframes heroGlowDrift {
+  0%,
+  100% {
+    transform: translate(-58%, 0) scale(1);
+  }
+  50% {
+    transform: translate(-42%, 4%) scale(1.12);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__glow {
+    animation: none;
+  }
+}
+.hero__glow.js-parallax {
+  animation: none;
+  transition: transform 0.15s ease-out;
+}
+
+.hero > *:not(.hero__glow) {
+  position: relative;
+  z-index: 1;
 }
 
 .corner-ornament {
@@ -365,21 +765,53 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   height: 84px;
   opacity: 0.5;
   pointer-events: none;
+  display: none;
+}
+@media (min-width: 640px) {
+  .corner-ornament {
+    display: block;
+  }
 }
 .corner-ornament::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border: 1.4px solid var(--gold);
 }
-.corner-ornament--tl { top: 20px; left: 20px; border-top: none; border-left: none; }
-.corner-ornament--tl::before { border-right: none; border-bottom: none; }
-.corner-ornament--tr { top: 20px; right: 20px; }
-.corner-ornament--tr::before { border-left: none; border-bottom: none; }
-.corner-ornament--bl { bottom: 20px; left: 20px; }
-.corner-ornament--bl::before { border-right: none; border-top: none; }
-.corner-ornament--br { bottom: 20px; right: 20px; }
-.corner-ornament--br::before { border-left: none; border-top: none; }
+.corner-ornament--tl {
+  top: 20px;
+  left: 20px;
+  border-top: none;
+  border-left: none;
+}
+.corner-ornament--tl::before {
+  border-right: none;
+  border-bottom: none;
+}
+.corner-ornament--tr {
+  top: 20px;
+  right: 20px;
+}
+.corner-ornament--tr::before {
+  border-left: none;
+  border-bottom: none;
+}
+.corner-ornament--bl {
+  bottom: 20px;
+  left: 20px;
+}
+.corner-ornament--bl::before {
+  border-right: none;
+  border-top: none;
+}
+.corner-ornament--br {
+  bottom: 20px;
+  right: 20px;
+}
+.corner-ornament--br::before {
+  border-left: none;
+  border-top: none;
+}
 
 .hero__names {
   display: flex;
@@ -394,6 +826,26 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   color: var(--maroon);
   font-size: clamp(2.1rem, 8vw, 3.6rem);
   letter-spacing: 0.01em;
+  display: inline-block;
+}
+.hero__name .letter-in {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(14px);
+  animation: letterIn 0.6s var(--ease-royal) forwards;
+}
+@keyframes letterIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__name .letter-in {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
 }
 .hero__divider svg {
   width: 34px;
@@ -402,7 +854,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   stroke-width: 1.2;
   fill: none;
 }
-.hero__divider circle { fill: var(--gold); stroke: none; }
+.hero__divider circle {
+  fill: var(--gold);
+  stroke: none;
+}
 
 .hero__message {
   font-family: var(--font-serif);
@@ -423,7 +878,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   align-items: center;
   gap: 12px;
 }
-.hero__dot { color: var(--gold); }
+.hero__dot {
+  color: var(--gold);
+}
 
 .scroll-cue {
   position: absolute;
@@ -435,11 +892,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   align-items: center;
   gap: 8px;
 }
-.scroll-cue span {
-  width: 1px;
-  height: 34px;
-  background: linear-gradient(var(--gold), transparent);
-  animation: scrollPulse 1.8s ease-in-out infinite;
+.scroll-cue__arrow {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--gold);
+  animation: scrollBounce 1.8s ease-in-out infinite;
 }
 .scroll-cue p {
   margin: 0;
@@ -448,9 +906,21 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   letter-spacing: 0.2em;
   color: var(--gold-dim);
 }
-@keyframes scrollPulse {
-  0%, 100% { opacity: 0.25; transform: scaleY(0.7); transform-origin: top; }
-  50% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+@keyframes scrollBounce {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue__arrow {
+    animation: none;
+  }
 }
 
 /* ==========================================================================
@@ -464,7 +934,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   animation: revealUp 0.9s var(--ease-royal) forwards;
 }
 @keyframes revealUp {
-  to { opacity: 1; transform: translateY(0); }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ==========================================================================
@@ -482,8 +955,16 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   inset: 0;
   opacity: 0.08;
   background-image:
-    repeating-linear-gradient(45deg, var(--gold) 0 1.5px, transparent 1.5px 26px),
-    repeating-linear-gradient(-45deg, var(--gold) 0 1.5px, transparent 1.5px 26px);
+    repeating-linear-gradient(
+      45deg,
+      var(--gold) 0 1.5px,
+      transparent 1.5px 26px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      var(--gold) 0 1.5px,
+      transparent 1.5px 26px
+    );
   pointer-events: none;
 }
 .invitation__text {
@@ -502,15 +983,19 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   color: var(--ivory-dim);
   opacity: 0.85;
 }
-.invitation .gold-divider span { background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+.invitation .gold-divider span {
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
 
 /* ==========================================================================
    COUPLE SECTION
    ========================================================================== */
 .couple {
+  position: relative;
   padding: 120px 24px;
   max-width: 1100px;
   margin: 0 auto;
+  overflow: hidden;
 }
 .couple__grid {
   display: grid;
@@ -520,13 +1005,24 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   max-width: 920px;
   margin: 0 auto;
 }
-.couple__card { text-align: center; }
-.couple__frame {
-  width: 160px;
-  margin: 0 auto 26px;
+.couple__card {
+  text-align: center;
+  position: relative;
+  padding: 20px;
+  border-radius: 8px;
 }
-.frame-svg { fill: none; stroke: var(--gold); stroke-width: 1.2; }
-.frame-motif { stroke: var(--gold-dim); stroke-width: 1; opacity: 0.7; }
+.couple__frame {
+  width: 240px;
+  margin: 0 auto 6px;
+  position: relative;
+}
+.couple__frame img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 12px 22px rgba(74, 14, 24, 0.16));
+}
 
 .couple__label {
   font-family: var(--font-display);
@@ -549,7 +1045,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   line-height: 1.7;
   font-size: 1.02rem;
 }
-.couple__lineage span { color: var(--ink); font-style: normal; }
+.couple__lineage span {
+  color: var(--ink);
+  font-style: normal;
+}
 
 .couple__ornament svg {
   width: 44px;
@@ -558,12 +1057,23 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   stroke-width: 1.1;
   fill: none;
 }
-.couple__ornament circle { fill: var(--ivory); }
+.couple__ornament circle {
+  fill: var(--ivory);
+}
 
 @media (max-width: 760px) {
-  .couple__grid { grid-template-columns: 1fr; gap: 30px; }
-  .couple__ornament { transform: rotate(90deg); margin: 0 auto; }
-  .couple__ornament svg { width: 100px; height: 44px; }
+  .couple__grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  .couple__ornament {
+    transform: rotate(90deg);
+    margin: 0 auto;
+  }
+  .couple__ornament svg {
+    width: 100px;
+    height: 44px;
+  }
 }
 
 /* ==========================================================================
@@ -581,11 +1091,23 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   bottom: 0;
   width: 220px;
   opacity: 0.35;
-  background-image: radial-gradient(circle at 20px 20px, var(--gold) 1.5px, transparent 1.6px);
+  background-image: radial-gradient(
+    circle at 20px 20px,
+    var(--gold) 1.5px,
+    transparent 1.6px
+  );
   background-size: 40px 40px;
 }
-.geo-pattern--left { left: -80px; -webkit-mask-image: linear-gradient(to right, black, transparent); mask-image: linear-gradient(to right, black, transparent); }
-.geo-pattern--right { right: -80px; -webkit-mask-image: linear-gradient(to left, black, transparent); mask-image: linear-gradient(to left, black, transparent); }
+.geo-pattern--left {
+  left: -80px;
+  -webkit-mask-image: linear-gradient(to right, black, transparent);
+  mask-image: linear-gradient(to right, black, transparent);
+}
+.geo-pattern--right {
+  right: -80px;
+  -webkit-mask-image: linear-gradient(to left, black, transparent);
+  mask-image: linear-gradient(to left, black, transparent);
+}
 
 .blessing__urdu {
   font-family: var(--font-urdu);
@@ -616,6 +1138,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   max-width: 720px;
   margin: 0 auto;
   padding-left: 34px;
+  perspective: 1000px;
 }
 .timeline__line {
   position: absolute;
@@ -627,7 +1150,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 }
 .timeline__line-fill {
   position: absolute;
-  top: 0; left: 0; width: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 0%;
   background: linear-gradient(var(--gold), var(--gold-dim));
   transition: height 0.2s linear;
@@ -638,7 +1163,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   text-align: left;
   margin-bottom: 46px;
 }
-.timeline__item:last-child { margin-bottom: 0; }
+.timeline__item:last-child {
+  margin-bottom: 0;
+}
 
 .timeline__dot {
   position: absolute;
@@ -657,9 +1184,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   border-radius: 4px;
   padding: 26px 28px;
   position: relative;
-  transition: transform 0.35s var(--ease-royal), box-shadow 0.35s var(--ease-royal);
 }
-.timeline__card:hover { transform: translateY(-4px); box-shadow: 0 16px 34px rgba(74,14,24,0.1); }
 
 .timeline__card--featured {
   background: var(--maroon-deep);
@@ -667,10 +1192,14 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   color: var(--ivory-dim);
 }
 .timeline__card--featured .timeline__title,
-.timeline__card--featured .timeline__number { color: var(--gold-bright); }
+.timeline__card--featured .timeline__number {
+  color: var(--gold-bright);
+}
 .timeline__card--featured .timeline__date,
 .timeline__card--featured .timeline__time,
-.timeline__card--featured .timeline__venue { color: var(--champagne); }
+.timeline__card--featured .timeline__venue {
+  color: var(--champagne);
+}
 
 .timeline__number {
   font-family: var(--font-display);
@@ -684,23 +1213,40 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   color: var(--maroon);
   margin: 6px 0 10px;
 }
-.timeline__date, .timeline__time, .timeline__venue {
+.timeline__date,
+.timeline__time,
+.timeline__venue {
   font-family: var(--font-body);
   font-size: 0.92rem;
   color: var(--maroon-soft);
   margin: 3px 0;
 }
-.timeline__venue--soon { font-style: italic; opacity: 0.8; }
+.timeline__venue--soon {
+  font-style: italic;
+  opacity: 0.8;
+}
 
 /* thematic accents per event */
-.timeline__item--haldi .timeline__dot { border-color: #c98a2c; }
-.timeline__item--mehndi .timeline__dot { border-color: #5f7a3d; }
-.timeline__item--reception .timeline__dot { border-color: var(--gold-dim); }
+.timeline__item--haldi .timeline__dot {
+  border-color: #c98a2c;
+}
+.timeline__item--mehndi .timeline__dot {
+  border-color: #5f7a3d;
+}
+.timeline__item--reception .timeline__dot {
+  border-color: var(--gold-dim);
+}
 
 @media (min-width: 640px) {
-  .timeline { padding-left: 46px; }
-  .timeline__line { left: 10px; }
-  .timeline__dot { left: -46px; }
+  .timeline {
+    padding-left: 46px;
+  }
+  .timeline__line {
+    left: 10px;
+  }
+  .timeline__dot {
+    left: -46px;
+  }
 }
 
 /* ==========================================================================
@@ -712,8 +1258,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   background: var(--maroon-deep);
   color: var(--ivory);
 }
-.countdown .eyebrow-soft { color: var(--gold-bright); }
-.countdown .section-title { color: var(--champagne); }
+.countdown .eyebrow-soft {
+  color: var(--gold-bright);
+}
+.countdown .section-title {
+  color: var(--champagne);
+}
 
 .countdown__grid {
   display: flex;
@@ -735,6 +1285,34 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   font-size: clamp(2.2rem, 7vw, 3.4rem);
   color: var(--gold-bright);
   line-height: 1;
+  display: inline-block;
+  transform-origin: 50% 100%;
+}
+.countdown__value.is-flipping {
+  animation: digitFlip 0.5s var(--ease-royal);
+}
+@keyframes digitFlip {
+  0% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+  45% {
+    transform: rotateX(90deg);
+    opacity: 0.3;
+  }
+  55% {
+    transform: rotateX(-90deg);
+    opacity: 0.3;
+  }
+  100% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .countdown__value.is-flipping {
+    animation: none;
+  }
 }
 .countdown__label {
   margin-top: 10px;
@@ -761,9 +1339,11 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
    VENUE
    ========================================================================== */
 .venue {
+  position: relative;
   padding: 130px 24px;
   text-align: center;
   background: var(--ivory);
+  overflow: hidden;
 }
 .venue__card {
   max-width: 460px;
@@ -772,6 +1352,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   border: 1px solid var(--beige);
   border-radius: 4px;
   background: #fff;
+  position: relative;
 }
 .venue__card--secondary {
   background: transparent;
@@ -791,7 +1372,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   color: var(--maroon);
   margin: 0 0 14px;
 }
-.venue__name--small { font-size: 1.1rem; opacity: 0.85; }
+.venue__name--small {
+  font-size: 1.1rem;
+  opacity: 0.85;
+}
 .venue__address {
   font-family: var(--font-serif);
   font-style: italic;
@@ -800,7 +1384,10 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   color: var(--maroon-soft);
   margin: 0 0 22px;
 }
-.venue__address--soon { margin-bottom: 0; opacity: 0.75; }
+.venue__address--soon {
+  margin-bottom: 0;
+  opacity: 0.75;
+}
 .venue__map-link {
   display: inline-block;
   font-family: var(--font-display);
@@ -809,17 +1396,24 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   color: var(--gold-dim);
   border-bottom: 1px solid var(--gold-dim);
   padding-bottom: 3px;
-  transition: color 0.25s, border-color 0.25s;
+  transition:
+    color 0.25s,
+    border-color 0.25s;
 }
-.venue__map-link:hover { color: var(--maroon); border-color: var(--maroon); }
+.venue__map-link:hover {
+  color: var(--maroon);
+  border-color: var(--maroon);
+}
 
 /* ==========================================================================
    FAMILY INVITATION
    ========================================================================== */
 .family {
+  position: relative;
   padding: 120px 24px;
   background: var(--champagne);
   text-align: center;
+  overflow: hidden;
 }
 .family__text {
   font-family: var(--font-serif);
@@ -860,7 +1454,9 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   text-align: center;
   overflow: hidden;
 }
-.jaali-bg--final { opacity: 0.06; }
+.jaali-bg--final {
+  opacity: 0.06;
+}
 .final__title {
   font-family: var(--font-display);
   font-size: clamp(1.8rem, 5vw, 2.6rem);
@@ -890,7 +1486,12 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   line-height: 1.8;
   margin: 0 0 40px;
 }
-.final__signature span { color: var(--gold-bright); font-family: var(--font-display); font-style: normal; font-size: 1.15rem; }
+.final__signature span {
+  color: var(--gold-bright);
+  font-family: var(--font-display);
+  font-style: normal;
+  font-size: 1.15rem;
+}
 .final__see-you {
   font-family: var(--font-display);
   font-size: 1.1rem;
@@ -902,7 +1503,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   padding: 26px;
   text-align: center;
   background: var(--maroon-deep);
-  border-top: 1px solid rgba(201,163,92,0.25);
+  border-top: 1px solid rgba(201, 163, 92, 0.25);
 }
 .site-footer p {
   margin: 0;
@@ -916,14 +1517,30 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
    RESPONSIVE REFINEMENTS
    ========================================================================== */
 @media (max-width: 480px) {
-  .hero { padding-top: 88px; }
-  .btn-enter { padding: 14px 32px; }
-  .venue__card, .timeline__card { padding: 26px 20px; }
-  .couple__frame { width: 130px; }
+  .hero {
+    padding-top: 88px;
+  }
+  .btn-enter {
+    padding: 14px 32px;
+  }
+  .venue__card,
+  .timeline__card {
+    padding: 26px 20px;
+  }
+  .couple__frame {
+    width: 190px;
+  }
 }
 
 @media (min-width: 1000px) {
-  .timeline-section, .couple, .venue, .family, .final, .invitation, .blessing, .countdown {
+  .timeline-section,
+  .couple,
+  .venue,
+  .family,
+  .final,
+  .invitation,
+  .blessing,
+  .countdown {
     padding-left: 40px;
     padding-right: 40px;
   }
