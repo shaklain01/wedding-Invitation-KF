@@ -731,7 +731,7 @@ button {
   pointer-events: none;
   background-image: url("images/background_for_hero.png");
   background-repeat: no-repeat;
-  background-size: auto 82%;
+  background-size: auto 100%;
   background-position: center;
   opacity: 0;
   transition: opacity 1.5s var(--ease-royal);
