@@ -9,6 +9,15 @@
     "(prefers-reduced-motion: reduce)",
   ).matches;
 
+  // MOBILE PERF: single source of truth for "is this a phone/small touch
+  // device" — used to scale back the petal canvas, swap the scrubbed 3D
+  // scroll-zoom for a cheap fade, etc. Matches the CSS breakpoints used
+  // elsewhere in style.css (max-width: 640px, pointer: coarse) so JS and
+  // CSS agree on what counts as "mobile". Desktop behaviour is untouched.
+  var isMobile = window.matchMedia(
+    "(max-width: 640px), (pointer: coarse)",
+  ).matches;
+
   /* ------------------------------------------------------------------------
      CONFIG — edit here to update details later
      ------------------------------------------------------------------------ */
@@ -237,6 +246,36 @@
           gsap.set(el, { opacity: 1, scale: 1, y: 0, z: 0 });
           return;
         }
+
+        // MOBILE PERF: the scrubbed perspective/scale/translateZ zoom below
+        // recalculates a 3D transform on every scroll tick, which is heavy
+        // on mobile GPUs/CPUs. On phones and touch devices, swap it for a
+        // one-shot, lightweight fade + small translateY that plays once
+        // (no scrub), so it never taxes the scroll thread. Explicitly
+        // pinning scale/z to 1/0 also cancels out the perspective 3D base
+        // state that .zoom-in sets in CSS. Desktop keeps the original
+        // scrub-driven 3D zoom, completely unchanged.
+        if (isMobile) {
+          gsap.fromTo(
+            el,
+            { opacity: 0, y: 24, scale: 1, z: 0 },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              z: 0,
+              duration: 0.6,
+              ease: "power2.out",
+              scrollTrigger: {
+                trigger: el,
+                start: "top 92%",
+                toggleActions: "play none none none",
+              },
+            },
+          );
+          return;
+        }
+
         gsap.fromTo(
           el,
           {
@@ -263,12 +302,15 @@
         );
       });
 
-      // Timeline fill progress
+      // Timeline fill progress — animates transform:scaleY (compositor-only)
+      // instead of the CSS `height` property, so the browser never has to
+      // recalculate layout on every scroll tick. Same visual result, far
+      // cheaper on both desktop and mobile.
       var timelineWrap = document.getElementById("timelineWrap");
       var timelineFill = document.getElementById("timelineFill");
       if (timelineWrap && timelineFill) {
         gsap.to(timelineFill, {
-          height: "100%",
+          scaleY: 1,
           ease: "none",
           scrollTrigger: {
             trigger: timelineWrap,
@@ -394,20 +436,34 @@
   /* ------------------------------------------------------------------------
      PETAL RAIN — realistic falling flower petals across the whole page.
      Each petal is a tapered, curved almond shape (drawn with bezier curves,
-     not a plain ellipse), shaded with a soft radial gradient + a faint
-     centre vein, and given a light drop-shadow for depth. Two depth layers
-     (near/far) give a gentle parallax feel. Falling motion tumbles the
-     petal end-over-end rather than spinning flat, and sway follows a
-     lazy figure-8 like real petals do. Disabled under
-     prefers-reduced-motion. Canvas is position:fixed + pointer-events:none
-     (see CSS), so this never affects scroll/layout.
+     not a plain ellipse). On desktop it's additionally shaded with a soft
+     gradient + a faint centre vein and a light drop-shadow for depth, with
+     two visual depth layers (near/far) for parallax.
+
+     MOBILE PERF:
+     - Far fewer petals (6–8 vs 24).
+     - No shadowBlur/shadowOffset (forces an expensive blur pass per shape
+       per frame) and no ctx.filter blur (frequently falls back to a slow
+       software path on mobile browsers) — mobile petals are drawn as a
+       single flat/solid fill instead.
+     - Per-petal gradients are created ONCE at spawn time and cached on the
+       petal object, never recreated inside the per-frame draw loop — this
+       benefits desktop too, since createLinearGradient() is real work.
+     - Canvas backing resolution is capped at 1x DPR on mobile (vs up to 2x)
+       to cut raw pixel fill-rate, the single biggest canvas cost on phones.
+     - The rAF loop is fully paused via the Page Visibility API whenever the
+       tab/app is backgrounded, and resumed on return, so it never burns
+       battery/CPU while the person isn't looking at the page.
+     Disabled entirely under prefers-reduced-motion. Canvas is
+     position:fixed + pointer-events:none (see CSS), so none of this ever
+     affects scroll/layout.
      ------------------------------------------------------------------------ */
   function initPetalRain() {
     var canvas = document.getElementById("particle-canvas");
     if (!canvas || prefersReduced) return;
     var ctx = canvas.getContext("2d");
     var petals = [];
-    var count = window.innerWidth < 640 ? 15 : 24; // fewer, more detailed petals read as "realistic"
+    var count = isMobile ? 7 : 24;
     // warm blush / cream / champagne tones, each as [light, mid, dark] for shading
     var palettes = [
       ["#fbe6d8", "#eec3ab", "#cf9a7c"], // blush pink
@@ -416,9 +472,10 @@
       ["#f4e2c8", "#e0bd7a", "#a3854f"], // gold accent (matches --gold)
     ];
     var w, h, dpr;
+    var rafId = null;
 
     function resize() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = isMobile ? 1 : Math.min(window.devicePixelRatio || 1, 2);
       w = window.innerWidth;
       h = window.innerHeight;
       canvas.width = w * dpr;
@@ -430,16 +487,28 @@
     resize();
     window.addEventListener("resize", resize);
 
+    // Gradient is built once per petal (local coordinates are always the
+    // same relative span since we translate/rotate before drawing), so this
+    // never runs inside the animation loop.
+    function makeGradient(palette, size) {
+      var grad = ctx.createLinearGradient(0, -size, 0, size);
+      grad.addColorStop(0, palette[0]);
+      grad.addColorStop(0.55, palette[1]);
+      grad.addColorStop(1, palette[2]);
+      return grad;
+    }
+
     function makePetal(startAbove) {
       var layer = Math.random() < 0.5 ? "near" : "far";
       var isNear = layer === "near";
       var palette = palettes[Math.floor(Math.random() * palettes.length)];
+      var size = isNear
+        ? Math.random() * 6 + 10 // 10 - 16 px (foreground, bigger)
+        : Math.random() * 4 + 5; // 5 - 9 px (background, smaller)
       return {
         x: Math.random() * w,
         y: startAbove ? -30 - Math.random() * h * 0.4 : Math.random() * h,
-        size: isNear
-          ? Math.random() * 6 + 10 // 10 - 16 px (foreground, bigger)
-          : Math.random() * 4 + 5, // 5 - 9 px (background, smaller)
+        size: size,
         fallSpeed: isNear
           ? Math.random() * 0.5 + 0.55
           : Math.random() * 0.3 + 0.25,
@@ -451,10 +520,12 @@
         tumble: Math.random() * Math.PI * 2, // simulates tumbling end-over-end
         tumbleSpeed: Math.random() * 0.05 + 0.02,
         palette: palette,
+        // On mobile we skip the gradient entirely and just fill with the
+        // mid tone — one solid fillStyle, no gradient object at all.
+        grad: isMobile ? null : makeGradient(palette, size),
         alpha: isNear
           ? Math.random() * 0.22 + 0.55
           : Math.random() * 0.18 + 0.22,
-        blur: isNear ? 0 : 0.6,
         layer: layer,
       };
     }
@@ -502,31 +573,31 @@
           ctx.rotate(p.rotation);
           ctx.scale(squash, 1);
 
-          if (p.blur) ctx.filter = "blur(" + p.blur + "px)";
-
           drawPetalShape(ctx, p.size);
 
-          var grad = ctx.createLinearGradient(0, -p.size, 0, p.size);
-          grad.addColorStop(0, p.palette[0]);
-          grad.addColorStop(0.55, p.palette[1]);
-          grad.addColorStop(1, p.palette[2]);
           ctx.globalAlpha = p.alpha;
-          ctx.fillStyle = grad;
-          ctx.shadowColor = "rgba(74, 14, 24, 0.18)";
-          ctx.shadowBlur = p.layer === "near" ? 5 : 2;
-          ctx.shadowOffsetY = 1.5;
+          ctx.fillStyle = p.grad || p.palette[1];
+
+          if (!isMobile) {
+            ctx.shadowColor = "rgba(74, 14, 24, 0.18)";
+            ctx.shadowBlur = p.layer === "near" ? 5 : 2;
+            ctx.shadowOffsetY = 1.5;
+          }
           ctx.fill();
 
-          // faint centre vein for texture
-          ctx.shadowBlur = 0;
-          ctx.shadowOffsetY = 0;
-          ctx.globalAlpha = p.alpha * 0.5;
-          ctx.strokeStyle = p.palette[2];
-          ctx.lineWidth = Math.max(0.4, p.size * 0.045);
-          ctx.beginPath();
-          ctx.moveTo(0, -p.size * 1.0);
-          ctx.lineTo(0, p.size * 0.85);
-          ctx.stroke();
+          // faint centre vein for texture — desktop only, one extra stroke
+          // per petal per frame that mobile skips entirely.
+          if (!isMobile) {
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.globalAlpha = p.alpha * 0.5;
+            ctx.strokeStyle = p.palette[2];
+            ctx.lineWidth = Math.max(0.4, p.size * 0.045);
+            ctx.beginPath();
+            ctx.moveTo(0, -p.size * 1.0);
+            ctx.lineTo(0, p.size * 0.85);
+            ctx.stroke();
+          }
 
           ctx.restore();
 
@@ -544,10 +615,24 @@
         });
       });
 
-      ctx.filter = "none";
-      requestAnimationFrame(draw);
+      rafId = requestAnimationFrame(draw);
     }
-    draw();
+
+    rafId = requestAnimationFrame(draw);
+
+    // Pause the render loop entirely when the tab/app is backgrounded
+    // (switched app, screen locked, minimised) so it costs nothing while
+    // nobody can see it, and pick back up cleanly when it returns.
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) {
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+      } else if (rafId === null) {
+        rafId = requestAnimationFrame(draw);
+      }
+    });
   }
 
   /* ------------------------------------------------------------------------
