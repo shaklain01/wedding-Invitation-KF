@@ -57,6 +57,22 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* MOBILE PERF: the feTurbulence SVG filter above is expensive to rasterize
+   on mobile GPUs. Swap it for a much cheaper tiled radial-gradient dot
+   pattern that still reads as a soft grain/paper texture, at a lower
+   opacity so it stays subtle. Desktop is untouched. */
+@media (max-width: 640px) {
+  body::after {
+    background-image: radial-gradient(
+      circle,
+      rgba(42, 24, 16, 0.6) 0.5px,
+      transparent 0.6px
+    );
+    background-size: 3px 3px;
+    opacity: 0.02;
+  }
+}
+
 body.lock-scroll {
   overflow: hidden;
   height: 100%;
@@ -635,6 +651,35 @@ button {
   mix-blend-mode: overlay;
   z-index: 2;
 }
+
+/* MOBILE PERF: script.js never attaches the mousemove tilt/glare listeners
+   on coarse-pointer (touch) devices, so the 3D tilt never actually runs on
+   mobile — but the `will-change` hints below still force the browser to
+   promote every card + zoom-in element to its own GPU layer for nothing,
+   which costs memory and compositing time on weaker mobile GPUs. Also swap
+   the scrub-driven 3D starting transform for a plain fade+slide so mobile
+   never has to decode/animate perspective/scale/translateZ at all — see
+   the matching JS change in initScrollAnimations(). Desktop is untouched. */
+@media (max-width: 640px), (pointer: coarse) {
+  .zoom-in {
+    transform: translateY(24px);
+    will-change: auto;
+  }
+  .zoom-in.is-visible {
+    transition:
+      transform 0.6s ease-out,
+      opacity 0.6s ease-out;
+    transform: translateY(0);
+  }
+  .tilt-card {
+    will-change: auto;
+  }
+  .tilt-card:hover {
+    box-shadow:
+      0 10px 24px -8px rgba(74, 14, 24, 0.28),
+      0 0 0 1px rgba(201, 163, 92, 0.25);
+  }
+}
 .hero__medallion {
   display: block;
   width: min(230px, 62vw);
@@ -686,7 +731,7 @@ button {
   pointer-events: none;
   background-image: url("images/background_for_hero.png");
   background-repeat: no-repeat;
-  background-size: auto 100%;
+  background-size: auto 82%;
   background-position: center;
   opacity: 0;
   transition: opacity 1.5s var(--ease-royal);
@@ -752,6 +797,17 @@ button {
 .hero__glow.js-parallax {
   animation: none;
   transition: transform 0.15s ease-out;
+}
+
+/* MOBILE PERF: the continuous transform:scale + translate keyframe is a
+   compositor cost that runs forever, on every mobile page whether or not
+   anyone is looking at it. Keep the glow itself (still a nice soft warmth
+   behind the names) but freeze it — no animation loop needed. */
+@media (max-width: 640px), (pointer: coarse) {
+  .hero__glow {
+    animation: none;
+    transform: translate(-50%, 0);
+  }
 }
 
 .hero > *:not(.hero__glow) {
@@ -1153,9 +1209,10 @@ button {
   top: 0;
   left: 0;
   width: 100%;
-  height: 0%;
+  height: 100%;
   background: linear-gradient(var(--gold), var(--gold-dim));
-  transition: height 0.2s linear;
+  transform: scaleY(0);
+  transform-origin: top;
 }
 
 .timeline__item {
