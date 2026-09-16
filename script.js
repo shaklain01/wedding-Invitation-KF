@@ -23,7 +23,7 @@
      ------------------------------------------------------------------------ */
   var CONFIG = {
     countdownTarget: "2026-11-12T23:00:00+05:30", // Nikah date/time, IST
-    mapsUrl: "", // Add a Google Maps URL here when available, e.g. "https://maps.google.com/?q=..."
+    mapsUrl: "https://maps.app.goo.gl/nqMJGFaBrrSn5Zwg6", // Add a Google Maps URL here when available, e.g. "https://maps.google.com/?q=..."
   };
 
   /* ------------------------------------------------------------------------
